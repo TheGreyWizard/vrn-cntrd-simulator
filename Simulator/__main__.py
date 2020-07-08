@@ -3,6 +3,7 @@ import matplotlib.patches as patches
 from matplotlib.path import Path
 from scipy.spatial import Voronoi, voronoi_plot_2d
 import numpy as np
+import random
 
 #Define Polygonal Environment
 
@@ -11,24 +12,27 @@ polygon_coords = [(0,0), (2.125,0),(2.9325,1.5),(2.975,1.6),
 
 resolution = 0.01 #TODO: Use it
 
-polygon = Path(polygon_coords) # make a polygon
+environment_polygon = Path(polygon_coords) # make a polygon
 
 fig, ax = plt.subplots()
-patch = patches.PathPatch(polygon, facecolor='None')
+patch = patches.PathPatch(environment_polygon, facecolor='None')
 ax.add_patch(patch)
 ax.set_xlim(-1, 4)
 ax.set_ylim(-1, 4)
 
+#Define agents
+
+no_robots = 10
+
 #Define pdf
 
-def density_gaussian(x_center, y_center):
+def generate_sample_points(polygon):
     resultx = []
     resulty = []
 
-    x, y = np.meshgrid(np.arange(0,3,0.01), np.arange(0,3,0.01)) # make a canvas with coordinates
+    x, y = np.meshgrid(np.arange(0,3,0.01), np.arange(0,3,0.01))
     x, y = x.flatten(), y.flatten()
     points = np.vstack((x,y)).T
-    print(points)
 
     grid = polygon.contains_points(points)
 
@@ -36,9 +40,26 @@ def density_gaussian(x_center, y_center):
             if(grid[i]):
                 resultx.append(points[i][0])
                 resulty.append(points[i][1])
-    
-    plt.scatter(resultx, resulty)
 
-density_gaussian(0,0)
+    return resultx, resulty
+
+
+x, y = generate_sample_points(environment_polygon)
+
+robot_positions = []
+for i in range(no_robots):
+    index = random.randint(0,len(x))
+    robot_positions.append([x[index], y[index]])
+
+x, y = zip(*robot_positions)
+
+plt.scatter(x,y)
+
+vor = Voronoi(robot_positions)
+vor_fig = voronoi_plot_2d(vor, show_vertices=False, line_colors='orange',
+                line_width=2, line_alpha=0.6, point_size=2)
+
+def calculate_centroid(vornoi_vertices):
+    pass
 
 plt.show()
