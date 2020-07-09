@@ -87,38 +87,3 @@ def voronoi_finite_polygons_2d(vor, radius=None):
         new_regions.append(new_region.tolist())
 
     return new_regions, np.asarray(new_vertices)
-
-# make up data points
-np.random.seed(1234)
-points = np.random.rand(15, 2)
-
-# compute Voronoi tesselation
-vor = Voronoi(points)
-
-# plot
-regions, vertices = voronoi_finite_polygons_2d(vor)
-
-box = Polygon([(0,0), (2.125,0),(2.9325,1.5),(2.975,1.6),
-(2.9325,1.7),(2.295,2.1),(0.85,2.3),(0.17,1.2),(0,0)])
-
-# colorize
-
-for region in regions:
-    polygon = vertices[region]
-    # Clipping polygon
-    poly = Polygon(polygon)
-    poly = poly.intersection(box)
-    polygon = [p for p in poly.exterior.coords]
-
-    plt.fill(*zip(*polygon), alpha=0.4)
-
-    exteriorx, exteriory = zip(*polygon)
-
-    plt.plot(exteriorx, exteriory, 'ko')
-
-plt.axis('equal')
-plt.xlim(-1, 3)
-plt.ylim(-1, 3)
-
-plt.savefig('voro.png')
-plt.show()

@@ -4,8 +4,10 @@ from matplotlib.path import Path
 from scipy.spatial import Voronoi, voronoi_plot_2d
 import numpy as np
 import random
+from shapely.geometry import Polygon
 
 from Control_Law import calculate_centroid
+from FiniteVoronoiTesselection import voronoi_finite_polygons_2d
 
 #Define Polygonal Environment
 
@@ -51,6 +53,7 @@ def calculate_densityFunction(points, x_center, y_center):
 if __name__ == "__main__":
 
     environment_polygon = Path(polygon_coords) # make a polygon
+    shapely_polygon = Polygon(polygon_coords)
 
     Q = generate_sample_points(environment_polygon)
 
@@ -78,11 +81,24 @@ if __name__ == "__main__":
     x, y = zip(*Q)
     robot_x, robot_y = zip(*robot_positions)
 
-    centroid = calculate_centroid(environment_polygon, Q, cumulative_phi)
-
     plt.scatter(x,y, c=cumulative_phi)
-    plt.plot([centroid[0]], [centroid[1]], marker='o', markersize=3, color="red")
 
     vor = Voronoi(robot_positions)
+    regions, vertices = voronoi_finite_polygons_2d(vor)
+
+    for index in range(len(regions)):
+        region = regions[index]
+        poly = Polygon(vertices[region])
+        # Clipping polygon
+        poly = poly.intersection(shapely_polygon)
+        polygon_vertices = [p for p in poly.exterior.coords]
+        polygon = Path(polygon_vertices)
+
+        plt.fill(*zip(*polygon_vertices), alpha=0.4)
+
+        centroid = calculate_centroid(polygon, Q, cumulative_phi)
+
+        plt.scatter([vor.points[index][0]], [vor.points[index][1]], marker='x', color="black")
+        plt.plot([centroid[0]], [centroid[1]], marker='o', markersize=3, color="red")
 
     plt.show()
