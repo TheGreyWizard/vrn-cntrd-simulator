@@ -20,7 +20,7 @@ resolution = 0.01
 
 #Define agents
 
-no_robots = 10
+no_robots = 20
 
 #Define pdf
 
@@ -79,26 +79,37 @@ if __name__ == "__main__":
         cumulative_phi = np.sum([cumulative_phi, temp_phi], axis=0)
 
     x, y = zip(*Q)
-    robot_x, robot_y = zip(*robot_positions)
 
     plt.scatter(x,y, c=cumulative_phi)
 
-    vor = Voronoi(robot_positions)
-    regions, vertices = voronoi_finite_polygons_2d(vor)
+    no_iterations = 100
 
-    for index in range(len(regions)):
-        region = regions[index]
-        poly = Polygon(vertices[region])
-        # Clipping polygon
-        poly = poly.intersection(shapely_polygon)
-        polygon_vertices = [p for p in poly.exterior.coords]
-        polygon = Path(polygon_vertices)
+    for i in range(no_iterations):
 
-        plt.fill(*zip(*polygon_vertices), alpha=0.4)
+        vor = Voronoi(robot_positions)
+        regions, vertices = voronoi_finite_polygons_2d(vor)
+        robot_polygons = []
 
-        centroid = calculate_centroid(polygon, Q, cumulative_phi)
+        for index in range(len(regions)):
+            region = regions[index]
+            poly = Polygon(vertices[region])
+            # Clipping polygon
+            poly = poly.intersection(shapely_polygon)
+            polygon_vertices = [p for p in poly.exterior.coords]
+            robot_polygons.append(np.array(polygon_vertices))
+            polygon = Path(polygon_vertices)
 
-        plt.scatter([vor.points[index][0]], [vor.points[index][1]], marker='x', color="black")
-        plt.plot([centroid[0]], [centroid[1]], marker='o', markersize=3, color="red")
+            centroid = calculate_centroid(polygon, Q, cumulative_phi, resolution)
 
+            plt.plot([vor.points[index][0], centroid[0]], [vor.points[index][1], centroid[1]], color="yellow")
+
+            robot_positions[index] = centroid
+    
+    robot_x, robot_y = zip(*robot_positions)
+    plt.scatter(robot_x, robot_y, marker='o', color='red')
+
+    for polygon in robot_polygons:
+        plt.fill(*zip(*polygon), alpha=0.4)
+
+    # plt.fill(*zip(*polygon_vertices), alpha=0.4)
     plt.show()
