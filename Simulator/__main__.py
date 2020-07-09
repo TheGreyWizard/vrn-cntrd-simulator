@@ -5,6 +5,8 @@ from scipy.spatial import Voronoi, voronoi_plot_2d
 import numpy as np
 import random
 
+from Control_Law import calculate_centroid
+
 #Define Polygonal Environment
 
 polygon_coords = [(0,0), (2.125,0),(2.9325,1.5),(2.975,1.6),
@@ -12,7 +14,7 @@ polygon_coords = [(0,0), (2.125,0),(2.9325,1.5),(2.975,1.6),
 
 gaussian_centers = [(2.15,.75), (1.,.25), (.725,1.75), (.25,.7)]
 
-resolution = 0.01 #TODO: Use it
+resolution = 0.01
 
 #Define agents
 
@@ -23,6 +25,7 @@ no_robots = 10
 def generate_sample_points(polygon):
     resultx = []
     resulty = []
+    masked_points = []
 
     x, y = np.meshgrid(np.arange(0,3,resolution), np.arange(0,3,resolution))
     x, y = x.flatten(), y.flatten()
@@ -34,29 +37,26 @@ def generate_sample_points(polygon):
             if(grid[i]):
                 resultx.append(points[i][0])
                 resulty.append(points[i][1])
+                masked_points.append(points[i])
 
-    return resultx, resulty
+    return masked_points, resultx, resulty
 
 
 def calculate_densityFunction(x_points, y_points, x_center, y_center):
     phi = []
 
     for i in range(len(x_points)):
-        dist_x = (x_points[i] - x_center)
-        sqdist_x = pow(dist_x,2)
-
-        dist_y = (y_points[i] - y_center)
-        sqdist_y = pow(dist_y,2)
+        sqdist_x = (x_points[i] - x_center)**2
+        sqdist_y = (y_points[i] - y_center)**2
         phi.append(np.exp(6*(- sqdist_x - sqdist_y)))
     
     return np.asarray(phi)
-
 
 if __name__ == "__main__":
 
     environment_polygon = Path(polygon_coords) # make a polygon
 
-    x, y = generate_sample_points(environment_polygon)
+    Q, x, y = generate_sample_points(environment_polygon)
 
     fig, ax = plt.subplots()
     patch = patches.PathPatch(environment_polygon, facecolor='None')
@@ -81,6 +81,9 @@ if __name__ == "__main__":
 
     robot_x, robot_y = zip(*robot_positions)
 
-    plt.scatter(x,y, c=cumulative_phi, s=100)
+    centroid = calculate_centroid(environment_polygon, Q, cumulative_phi)
+
+    plt.scatter(x,y, c=cumulative_phi)
+    plt.plot([centroid[0]], [centroid[1]], marker='o', markersize=3, color="red")
 
     plt.show()
