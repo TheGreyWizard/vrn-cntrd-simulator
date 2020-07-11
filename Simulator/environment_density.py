@@ -14,6 +14,9 @@ class EnvironmentDensity:
 
     def calculate_gaussian_cumulative_density(self, polygon_sample_points):
         all_phi = []
+
+        if(len(self.gaussian_centers) == 0):
+            return np.ones(len(polygon_sample_points))
     
         for i in self.gaussian_centers:
             all_phi.append(self.calculate_gaussian(polygon_sample_points,i[0],i[1]))
