@@ -1,6 +1,7 @@
 from matplotlib.path import Path
 import matplotlib.patches as patches
 import numpy as np
+import matplotlib.pyplot as plt
 
 class SimulationEnvironment:
 
@@ -19,8 +20,6 @@ class SimulationEnvironment:
         self.polygon_bounds = Path(self.polygon_coords) # make a polygon
         self.sample_points = self.generate_sample_points()
 
-        self.plot_polygon_bounds
-
     def generate_sample_points(self):
         masked_points = []
 
@@ -36,10 +35,9 @@ class SimulationEnvironment:
 
         return masked_points
 
-    def plot_polygon_bounds(self):
+    def plot_polygon_bounds(self, plt_axis):
 
-        fig, ax = plt.subplots()
         patch = patches.PathPatch(self.polygon_bounds, facecolor='None')
-        ax.add_patch(patch)
-        ax.set_xlim(-1, 4)
-        ax.set_ylim(-1, 4)
+        plt_axis.add_patch(patch)
+        plt_axis.set_xlim(self.mesh_bounds[0] - 0.5, self.mesh_bounds[1] + 0.5)
+        plt_axis.set_ylim(self.mesh_bounds[0] - 0.5, self.mesh_bounds[1] + 0.5)

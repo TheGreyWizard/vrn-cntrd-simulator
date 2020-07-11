@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import numpy as np
 
 import argparse
 import os
@@ -25,24 +24,26 @@ if __name__ == "__main__":
 
     environment = SimulationEnvironment(config.environment_config)
     density = EnvironmentDensity(config.density_function_config, environment.sample_points)
+    controller = SimulationController(config.simulation_controller_config, environment)
 
-    #TODO: Cleanup this area
+    fig, axes = plt.subplots(1,3)
+    for axis in axes:
+        environment.plot_polygon_bounds(axis)
+
     x, y = zip(*environment.sample_points)
 
-    plt.scatter(x,y, c=density.environment_density)
+    axes[0].scatter(x,y, c=density.environment_density)
+    axes[2].scatter(x,y, c=density.environment_density)
 
-    #TODO: Use config variables
-    no_iterations = 10
-    no_robots = 10
-
-    controller = SimulationController(environment.polygon_coords, environment.sample_points, no_robots, no_iterations)
-    robot_positions, robot_polygons = controller.run_simulation(density.environment_density, environment.resolution)
+    controller.initialize_robots(axes[0])
+    robot_polygons = controller.run_simulation(density.environment_density, axes[1])
     
-    robot_x, robot_y = zip(*robot_positions)
-    plt.scatter(robot_x, robot_y, marker='o', color='red')
+    robot_x, robot_y = zip(*controller.robot_positions)
+    axes[1].scatter(robot_x, robot_y, marker='o', color='red')
+    axes[2].scatter(robot_x, robot_y, marker='o', color='red')
 
     for polygon in robot_polygons:
-        plt.fill(*zip(*polygon), alpha=0.4)
+        axes[2].plot(*zip(*polygon), color='black')
 
-    # plt.fill(*zip(*polygon_vertices), alpha=0.4)
+    plt.tight_layout()
     plt.show()

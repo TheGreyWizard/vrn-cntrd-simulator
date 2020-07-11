@@ -21,10 +21,12 @@ class DensityFunctionConfig:
 class SimulationControllerConfig:
     no_robots = None
     no_iterations = None
+    k_prop = None
 
     def __init__(self, serial_config):
         self.no_robots = serial_config['no_robots']
         self.no_iterations = serial_config['no_iterations']
+        self.k_prop = serial_config['k_prop']
 
 class ConfigParser:
 
