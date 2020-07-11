@@ -1,0 +1,15 @@
+{
+    "environment_config": {
+        "polygon_coords": [[0,0], [2.125,0],[2.9325,1.5],[2.975,1.6],[2.9325,1.7],[2.295,2.1],[0.85,2.3],[0.17,1.2],[0,0]],
+        "sample_resolution": 0.01,
+        "sample_mesh_bounds": [0,3]
+    },
+    "density_function_config": {
+        "gaussian_centers": [[2.15,0.75], [1,0.25], [0.725,1.75], [0.25,0.7]],
+        "gaussian_multiplier": 6
+    },
+    "simulation_controller_config": {
+        "no_robots": 10,
+        "no_iterations": 100
+    }
+}

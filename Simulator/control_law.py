@@ -32,6 +32,8 @@ class SimulationController:
 
         for i in range(self.no_iterations):
 
+            print("Iteration: ", i)
+
             vor = Voronoi(self.robot_positions)
             regions, vertices = voronoi_finite_polygons_2d(vor)
             robot_polygons = []
@@ -51,7 +53,11 @@ class SimulationController:
 
                 self.robot_positions[index] = centroid
         
+        print("Done")
+        
         return self.robot_positions, robot_polygons
+    
+
 
     def calculate_polygon_mass(self, polygon, points, density_vals, resolution):
 

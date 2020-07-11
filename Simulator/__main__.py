@@ -1,81 +1,42 @@
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from matplotlib.path import Path
 import numpy as np
 
-from Control_Law import SimulationController
+import argparse
+import os
 
-#Define Polygonal Environment
+from config_service import ConfigService
+from simulation_environment import SimulationEnvironment
+from environment_density import EnvironmentDensity
+from control_law import SimulationController
 
-polygon_coords = [(0,0), (2.125,0),(2.9325,1.5),(2.975,1.6),
-(2.9325,1.7),(2.295,2.1),(0.85,2.3),(0.17,1.2),(0,0)] #TODO: Make it customizable
+parser = argparse.ArgumentParser(description='Start simulation based on provided config')
+parser.add_argument('--config', type=str, help='path of config file to override default')
 
-gaussian_centers = [(2.15,.75), (1.,.25), (.725,1.75), (.25,.7)]
-
-resolution = 0.01
-
-#Define agents
-
-no_robots = 20
-
-#Define pdf
-
-def generate_sample_points(polygon):
-    masked_points = []
-
-    x, y = np.meshgrid(np.arange(0,3,resolution), np.arange(0,3,resolution))
-    x, y = x.flatten(), y.flatten()
-    points = np.vstack((x,y)).T
-
-    grid = polygon.contains_points(points)
-
-    for i in range(0,len(grid)):
-            if(grid[i]):
-                masked_points.append(points[i])
-
-    return masked_points
-
-
-def calculate_densityFunction(points, x_center, y_center):
-    phi = []
-
-    for i in range(len(points)):
-        sqdist_x = (points[i][0] - x_center)**2
-        sqdist_y = (points[i][1] - y_center)**2
-        phi.append(np.exp(6*(- sqdist_x - sqdist_y)))
-    
-    return np.asarray(phi)
+dir_path = os.path.dirname(os.path.realpath(__file__))
+config_file_path = dir_path + '/config.json'
 
 if __name__ == "__main__":
 
-    environment_polygon = Path(polygon_coords) # make a polygon
+    args = parser.parse_args()
+    if args.config:
+        config_file_path = args.config
 
-    Q = generate_sample_points(environment_polygon)
+    config = ConfigService(config_file_path)
 
-    fig, ax = plt.subplots()
-    patch = patches.PathPatch(environment_polygon, facecolor='None')
-    ax.add_patch(patch)
-    ax.set_xlim(-1, 4)
-    ax.set_ylim(-1, 4)
-    
-    all_phi = []
-    
-    for i in gaussian_centers:
-        all_phi.append(calculate_densityFunction(Q,i[0],i[1]))
+    environment = SimulationEnvironment(config.environment_config)
+    density = EnvironmentDensity(config.density_function_config, environment.sample_points)
 
-    cumulative_density = all_phi[0] #account for unimodal gaussian distribution
-    for i in range(1,len(all_phi)):
-        temp_phi = all_phi[i]
-        cumulative_density = np.sum([cumulative_density, temp_phi], axis=0)
+    #TODO: Cleanup this area
+    x, y = zip(*environment.sample_points)
 
-    x, y = zip(*Q)
+    plt.scatter(x,y, c=density.environment_density)
 
-    plt.scatter(x,y, c=cumulative_density)
+    #TODO: Use config variables
+    no_iterations = 10
+    no_robots = 10
 
-    no_iterations = 100
-
-    controller = SimulationController(polygon_coords, Q, no_robots, no_iterations)
-    robot_positions, robot_polygons = controller.run_simulation(cumulative_density, resolution)
+    controller = SimulationController(environment.polygon_coords, environment.sample_points, no_robots, no_iterations)
+    robot_positions, robot_polygons = controller.run_simulation(density.environment_density, environment.resolution)
     
     robot_x, robot_y = zip(*robot_positions)
     plt.scatter(robot_x, robot_y, marker='o', color='red')
