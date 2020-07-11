@@ -26,7 +26,7 @@ class SimulationControllerConfig:
         self.no_robots = serial_config['no_robots']
         self.no_iterations = serial_config['no_iterations']
 
-class ConfigService:
+class ConfigParser:
 
     environment_config = None
     density_function_config = None

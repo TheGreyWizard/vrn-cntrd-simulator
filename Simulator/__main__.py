@@ -4,7 +4,7 @@ import numpy as np
 import argparse
 import os
 
-from config_service import ConfigService
+from config_service import ConfigParser
 from simulation_environment import SimulationEnvironment
 from environment_density import EnvironmentDensity
 from control_law import SimulationController
@@ -21,7 +21,7 @@ if __name__ == "__main__":
     if args.config:
         config_file_path = args.config
 
-    config = ConfigService(config_file_path)
+    config = ConfigParser(config_file_path)
 
     environment = SimulationEnvironment(config.environment_config)
     density = EnvironmentDensity(config.density_function_config, environment.sample_points)
