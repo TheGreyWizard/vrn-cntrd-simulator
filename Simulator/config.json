@@ -10,7 +10,7 @@
     },
     "simulation_controller_config": {
         "no_robots": 20,
-        "no_iterations": 10,
+        "no_iterations": 200,
         "k_prop": 1
     }
 }
