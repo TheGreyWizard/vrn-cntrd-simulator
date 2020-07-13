@@ -7,9 +7,9 @@ from shapely.geometry import Polygon
 
 def voronoi_finite_polygons_2d(vor, radius=None):
 
-    # Sourced from https://stackoverflow.com/a/43023639/13808688
-
     """
+    Source: https://stackoverflow.com/a/43023639/13808688
+
     Reconstruct infinite voronoi regions in a 2D diagram to finite
     regions.
     Parameters
