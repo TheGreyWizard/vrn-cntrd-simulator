@@ -6,11 +6,11 @@
     },
     "density_function_config": {
         "gaussian_centers": [[2.15,0.75], [1,0.25], [0.725,1.75], [0.25,0.7]],
-        "gaussian_multiplier": 6
+        "variance_factor": 6
     },
     "simulation_controller_config": {
         "no_robots": 20,
-        "no_iterations": 200,
+        "no_iterations": 100,
         "k_prop": 1
     }
 }

@@ -1,6 +1,10 @@
 import json
 
 class EnvironmentConfig:
+    """
+    Summary: Configration data container for the environment
+    """
+
     polygon_coords = None
     sample_resolution = None
     sample_mesh_bounds = None
@@ -11,14 +15,24 @@ class EnvironmentConfig:
         self.sample_mesh_bounds = node_config['sample_mesh_bounds']
 
 class DensityFunctionConfig:
+
+    """
+    Summary: Configration data container for the density function calculations
+    """
+
     gaussian_centers = None
-    gaussian_multiplier = None
+    variance_factor = None
 
     def __init__(self, server_config):
         self.gaussian_centers = server_config['gaussian_centers']
-        self.gaussian_multiplier = server_config['gaussian_multiplier']
+        self.variance_factor = server_config['variance_factor']
 
 class SimulationControllerConfig:
+
+    """
+    Summary: Configration data container for the simulation controller
+    """
+
     no_robots = None
     no_iterations = None
     k_prop = None
@@ -29,6 +43,10 @@ class SimulationControllerConfig:
         self.k_prop = serial_config['k_prop']
 
 class ConfigParser:
+
+    """
+    Summary: Parses the input json configuration file into data containers to be injected into further objects
+    """
 
     environment_config = None
     density_function_config = None

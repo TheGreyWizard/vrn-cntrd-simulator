@@ -5,11 +5,11 @@ import matplotlib.pyplot as plt
 
 class SimulationEnvironment:
 
-    polygon_coords = None
-    polygon_bounds = None
-    sample_points = None
-    resolution = None
-    mesh_bounds = None
+    """
+    Summary: Creates the outer boundary for the simulation and generates samples within the environment for the simulation
+
+    The bounds and sampling resolution are configurable, along with choosing the bounds of the sampling
+    """
 
     def __init__(self, environment_config):
         
@@ -21,11 +21,20 @@ class SimulationEnvironment:
         self.sample_points = self.generate_sample_points()
 
     def generate_sample_points(self):
+        
+        """
+        Summary: Generates sample points within the polygon
+        """
+
         masked_points = []
+
+        # Uses the provided mesh bounds and resolution to create a mesh of to encompass the polygon with points
 
         x, y = np.meshgrid(np.arange(self.mesh_bounds[0],self.mesh_bounds[1],self.resolution), np.arange(self.mesh_bounds[0],self.mesh_bounds[1],self.resolution))
         x, y = x.flatten(), y.flatten()
         points = np.vstack((x,y)).T
+
+        # Based on the polygon bounds provided, filters and returns the points in the mesh that are contained within the polygon
 
         grid = self.polygon_bounds.contains_points(points)
 
@@ -36,6 +45,8 @@ class SimulationEnvironment:
         return masked_points
 
     def plot_polygon_bounds(self, plt_axis):
+
+        # Receives a matplotlib axis to patch the polygon path to plot other simulation results
 
         patch = patches.PathPatch(self.polygon_bounds, facecolor='None')
         plt_axis.add_patch(patch)
